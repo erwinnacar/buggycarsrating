@@ -1,0 +1,4 @@
+﻿<Properties>
+  <WatchEntry0 value="Environment(&quot;DataTableDir&quot;)" />
+  <WatchEntry1 value="Environment.LoadFromFile &quot;C:\Users\Erwin\Documents\UFT One\Config\config.xml&quot;" />
+</Properties>

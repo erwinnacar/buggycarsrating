@@ -1,0 +1,182 @@
+﻿Environment.LoadFromFile "C:\Users\Erwin\Documents\UFT One\Config\config.xml"
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_OpenBrowser
+'## DESCRIPTION: Opens browser/ application
+'## INPUT: strURL
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		26/02/2023			Initial
+'#########################################################################################################################
+'@Description Opens browser/ application
+'@Documentation Opens browser/ application
+Sub Proc_OpenBrowser(strURL)
+	
+	'Launch URL in Chrome	
+	SystemUtil.Run Environment("Browser"), strUrl
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_OpenBrowser", "An unexpected error has occured: " & Err.Description, False
+		err.clear
+		ExitTest
+	End If
+End Sub
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_CloseBrowser
+'## DESCRIPTION: Close browser/ application
+'## INPUT: strURL
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		26/02/2023			Initial
+'#########################################################################################################################
+'@Description Close browser/ application
+'@Documentation Close browser/ application
+Sub Proc_CloseBrowser()
+	
+	'Close Browser
+	If Browser("Buggy Cars Rating").Exist Then
+		Browser("Buggy Cars Rating").Close	
+	End If
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_CloseBrowser", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitTest
+	End If
+End Sub
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_LogTestResults
+'## DESCRIPTION: Logs actual test results with optional screenshots
+'## INPUT: sURL
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		26/02/2023			Initial
+'#########################################################################################################################
+'@Description Logs actual test results
+'@Documentation Logs actual test results
+Sub Proc_LogTestResults(strStatus, strStepName, strDetails, bolTakeScreenshot)
+	On error resume next
+	
+	If bolTakeScreenshot Then
+		If  Browser("Buggy Cars Rating").Exist Then
+			strScreenshotFileName = Environment("ScreenshotDir") & Environment("TestName") & "_" & Func_GetTimeStamp & ".png"
+			Proc_CreateFolderPath Environment("ScreenshotDir")
+			Browser("Buggy Cars Rating").CaptureBitmap strScreenshotFileName
+		End If
+	End If 
+
+	Select Case strStatus
+		Case "PASS"
+			If bolTakeScreenshot Then
+				Reporter.ReportEvent micPass, strStepName, sDetails, strScreenshotFileName
+			Else
+				Reporter.ReportEvent micPass, strStepName, strDetails
+			End If
+		Case "FAIL"
+			If bolTakeScreenshot Then
+				Reporter.ReportEvent micFail, strStepName, strDetails, strScreenshotFileName
+			Else
+				Reporter.ReportEvent micFail, strStepName, strDetails
+			End If
+		Case "DONE"
+			If bolTakeScreenshot Then
+				Reporter.ReportEvent micDone, sStepName, sDetails, strScreenshotFileName
+			Else
+				Reporter.ReportEvent micDone, strStepName, strDetails
+			End If
+		Case "WARNING"
+			If bolTakeScreenshot Then
+				Reporter.ReportEvent micWarning, strStepName, strDetails, strScreenshotFileName
+			Else
+				Reporter.ReportEvent micWarning, strStepName, strDetails
+			End If
+	End Select
+	
+End Sub
+
+'#########################################################################################################################
+'## FUNCTION NAME: Func_GetTimeStamp
+'## DESCRIPTION: Gets Time Stamp
+'## INPUT: n/a
+'## OUTPUT: Time stamp in mmddyyyyhhmmssAMPM
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'## 						   Erwin Nacar		27/02/2023		Initial
+'#########################################################################################################################
+'@Description Gets Time Stamp
+'@Documentation Gets Time Stamp
+Function Func_GetTimeStamp()
+	Func_GetTimeStamp = FormatDateTime(Now)
+	Func_GetTimeStamp = Replace(Func_GetTimeStamp, " ", "")
+	Func_GetTimeStamp = Replace(Func_GetTimeStamp, "/", "")
+	Func_GetTimeStamp = Replace(Func_GetTimeStamp, ":", "")
+End Function
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_CreateFolderPath
+'## DESCRIPTION: Creates Folder Path
+'## INPUT:  sFolderPath
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##                   			  Erwin Nacar		27/02/2023		Initial
+'#########################################################################################################################
+'@Description Creates Folder Path
+'@Documentation Creates Folder Path
+Sub	Proc_CreateFolderPath
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	If Not objFSO.FolderExists(sFolderPath) Then
+		objFSO.CreateFolder(sFolderPath)
+	End If
+	Set objFSO = Nothing
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_CreateFolderPath", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitActionIteration
+	End If
+End Sub
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_GetDataFromLocal
+'## DESCRIPTION: Downloads the data file from local
+'## INPUT:  strFilePath
+'## OUTPUT:  N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##                     			   Erwin Nacar		 26/02/2023		Initial
+'#########################################################################################################################
+'@Description Downloads the data file from Local
+'@Documentation Downloads the data file from Local
+Sub Proc_GetDataFromLocal(strFilePath)
+
+	On error resume next
+	
+	'Create file system object
+	Set objFso = CreateObject("Scripting.FileSystemObject") 
+	
+	'Verify if the specified file exists
+	If objFso.FileExists(strFilePath) Then 
+		'Import to test 
+		DataTable.Import strFilePath
+		
+		Proc_LogTestResults "PASS", "Proc_GetDataFromLocal", "Data file was successfully imported.", False
+	Else 
+		Proc_LogTestResults "FAIL", "Proc_GetDataFromLocal", "Data file was not successfully imported. No file found.", False
+		ExitTest
+	End If
+	
+	Set objFso = Nothing 
+
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_GetDataFromLocal", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitTest
+	End If
+End Sub
+

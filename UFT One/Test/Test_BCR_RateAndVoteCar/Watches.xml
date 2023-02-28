@@ -1,0 +1,4 @@
+﻿<Properties>
+  <WatchEntry0 value="stroutput" />
+  <WatchEntry1 value="Trim(stroutput(1))" />
+</Properties>

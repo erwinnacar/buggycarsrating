@@ -1,0 +1,305 @@
+﻿'Import Data
+Proc_GetDataFromLocal Environment("DataTableDir") + Environment("TestName") + ".xlsx"
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_BCR_RegisterNewUser
+'## DESCRIPTION: Register a new user
+'## INPUT: N/A
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		26/02/2023			Initial
+'#########################################################################################################################
+'@Description Register a new user
+'@Documentation Register a new user
+Sub Proc_BCR_RegisterNewUser()
+	
+	Dim strFName
+	Dim strLName
+	Dim strUserName
+	Dim strPass
+	
+	'Get data value from data table
+	strFName = DataTable.Value("First Name", "Global")
+	strLName = DataTable.Value("Last Name", "Global")
+	strUserName = DataTable.Value("Username", "Global")
+	strPass = DataTable.Value("Password", "Global")
+	
+	'Click Register
+	Browser("Buggy Cars Rating").Page("Home Page").WebButton("btnRegister").Click
+	
+	If Browser("Buggy Cars Rating").Page("Registration Page").WebElement("lblRegisterWithBuggyCars").Exist Then
+		
+		'Enter username
+		Browser("Buggy Cars Rating").Page("Registration Page").WebEdit("txtRegUsername").Set strUserName
+		
+		'Enter First name
+		Browser("Buggy Cars Rating").Page("Registration Page").WebEdit("txtFirstName").Set strFName
+		
+		'Enter Last name
+		Browser("Buggy Cars Rating").Page("Registration Page").WebEdit("txtLastName").Set strLName
+		
+		'Enter Password
+		Browser("Buggy Cars Rating").Page("Registration Page").WebEdit("txtRegPassword").SetSecure strPass
+		
+		'Confirm Password
+		Browser("Buggy Cars Rating").Page("Registration Page").WebEdit("txtConfirmPassword").SetSecure strPass
+		
+		'Click Register button
+		Browser("Buggy Cars Rating").Page("Registration Page").WebButton("btnRegister").Click
+		
+		'Validate if registration is successful
+		If Browser("Buggy Cars Rating").Page("Registration Page").WebElement("lblRegSuccess").Exist Then
+			Proc_LogTestResults "PASS", "Registration of new user", "Registration is successful", False
+		Else 
+			Proc_LogTestResults "FAIL", "Registration of new user", "Registration is unsuccessful", True
+		End If
+
+	Else 
+		Proc_LogTestResults "FAIL", "Registration of new user", "Registration page is not displayed", True		
+	End If
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_BCR_RegisterNewUser", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitActionIteration
+	End If
+	
+End Sub
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_BCR_Login
+'## DESCRIPTION: Login using an existing user credentials
+'## INPUT: N/A
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		27/02/2023			Initial
+'#########################################################################################################################
+'@Description Login using an existing user credentials
+'@Documentation Login using an existing user credentials
+Sub Proc_BCR_Login()
+	
+	Dim strUserName
+	Dim strPassword
+	
+	'Get data value from data table
+	strUserName = DataTable.Value("Username", "Global")
+	strPassword = DataTable.Value("Password", "Global")
+	
+	If Browser("Buggy Cars Rating").Page("Home Page").WebEdit("txtUsername").Exist Then
+		Browser("Buggy Cars Rating").Page("Home Page").WebEdit("txtUsername").Set strUserName
+		Browser("Buggy Cars Rating").Page("Home Page").WebEdit("txtPassword").SetSecure strPassword
+		Browser("Buggy Cars Rating").Page("Home Page").WebButton("btnLogin").Click
+		
+		'Validate if login successfully - "Hi, <first name>"
+		If Browser("Buggy Cars Rating").Page("Home Page").WebElement("lblFirstName").Exist Then
+			Proc_LogTestResults "PASS", "Login", "Login successful", False
+		Else 
+			Proc_LogTestResults "FAIL", "Login", "Unable to Login", True
+		End If
+		
+	End If
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_BCR_Login", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitActionIteration
+	End If
+	
+End Sub
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_BCR_Logout
+'## DESCRIPTION: Logout from the application
+'## INPUT: N/A
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		27/02/2023			Initial
+'#########################################################################################################################
+'@Description Logout from the application
+'@Documentation  Logout from the application
+Sub Proc_BCR_Logout()
+	
+	If Browser("Buggy Cars Rating").Page("Home Page").Link("linkLogout").Exist Then
+		'Click Logout button
+		Browser("Buggy Cars Rating").Page("Home Page").Link("linkLogout").Click
+		
+		'Validate if successfully logout
+		If Browser("Buggy Cars Rating").Page("Home Page").Link("linkProfile").Exist Then
+			Proc_LogTestResults "FAIL", "Logout", "Unable to logout", True
+		Else 
+			Proc_LogTestResults "PASS", "Logout", "Logout is successful", False
+		End If
+	End If
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_BCR_Logout", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitActionIteration
+	End If
+
+End Sub
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_BCR_UpdateProfile
+'## DESCRIPTION: Update existing user profile details
+'## INPUT: N/A
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		27/02/2023			Initial
+'#########################################################################################################################
+'@Description Update existing user profile details
+'@Documentation  Update existing user profile details
+Sub Proc_BCR_UpdateProfile()
+	
+	Dim strProfFirstName
+	Dim strProfLastName
+	Dim strGender
+	Dim strAge
+	Dim strAddress
+	Dim strPhone
+	Dim strHobby
+	Dim strProfPassword
+	Dim strNewPassword
+	Dim strLanguage
+	
+	strProfFirstName = DataTable.Value("First Name", "Global")
+	strProfLastName = DataTable.Value("Last Name", "Global")
+	strGender = DataTable.Value("Gender", "Global")
+	strAge = DataTable.Value("Age", "Global")
+	strAddress = DataTable.Value("Address", "Global")
+	strPhone = DataTable.Value("Phone", "Global")
+	strHobby = DataTable.Value("Hobby", "Global")
+	strProfPassword = DataTable.Value("Current Password", "Global")
+	strNewPassword = DataTable.Value("New Password", "Global")
+	strLanguage = DataTable.Value("Language", "Global")
+	
+	'Click Profile link
+	Browser("Buggy Cars Rating").Page("Home Page").Link("linkProfile").Click
+	
+	'Update first name
+	If strProfFirstName <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtFirstName").Set strProfFirstName
+	End If
+	
+	'Update last name
+	If strProfLastName <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtLastName").Set strProfLastName
+	End If
+	
+	'Update gender
+	If strGender <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtGender").Set strGender
+	End If
+	
+	'Update age
+	If strAge <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtAge").Set strAge
+	End If
+	
+	'Update address
+	If strAddress <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtAddress").Set strAddress
+	End If
+	
+	'Update phone number
+	If strPhone <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtPhone").Set strPhone
+	End If
+	
+	'Update hobby
+	If strHobby <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebList("txtHobby").Select strHobby
+	End If
+	
+	'Update password
+	If strNewPassword <> "" Then
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtCurrentPassword").SetSecure strProfPassword
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtNewPassword").SetSecure strNewPassword
+		Browser("Buggy Cars Rating").Page("Profile Page").WebEdit("txtNewPasswordConfirmation").SetSecure strNewPassword
+	End If
+	
+	'Click Save button
+	Browser("Buggy Cars Rating").Page("Profile Page").WebButton("btnSave").Click
+	
+	'Validate if profile update is successful
+	If Browser("Buggy Cars Rating").Page("Profile Page").WebElement("lblProfileSave").Exist Then
+		Proc_LogTestResults "PASS", "Update profile", "Successfully updated profile", False
+	Else 
+		Proc_LogTestResults "FAIL", "Update profile", "Successfully updated profile", True
+	End If
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_BCR_UpdateProfile", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitActionIteration
+	End If
+	
+End Sub
+
+'#########################################################################################################################
+'## PROCEDURE NAME: Proc_BCR_RateCarByPopularMake
+'## DESCRIPTION: Rate cars by popular Make
+'## INPUT: N/A
+'## OUTPUT: N/A
+'#########################################################################################################################
+'## DOCUMENT HISTORY:   AUTHOR                     	DATE                	DESCRIPTION    
+'##						  Erwin Nacar		27/02/2023			Initial
+'#########################################################################################################################
+'@Description Rate cars by popular Make
+'@Documentation  Rate cars by popular Make
+Sub Proc_BCR_RateCarByPopularMake()
+	
+	Dim strModelToVote
+	Dim numRowCount
+	
+	strModelToVote = DataTable.Value("Car Model", "Global")
+	
+	'Click Popular Make
+	Browser("Buggy Cars Rating").Page("Home Page").Image("imgPopularMake").Click
+	
+	numRowCount = Browser("Buggy Cars Rating").Page("Popular Make Page").WebTable("tblCarModel").RowCount
+	For i = 2 To numRowCount
+		'Get Model column value
+		strColVal = Browser("Buggy Cars Rating").Page("Popular Make Page").WebTable("tblCarModel").GetCellData(i, 2)
+		If strColVal = strModelToVote Then
+			'Click the model link
+			Browser("Buggy Cars Rating").Page("Popular Make Page").WebTable("tblCarModel").ChildItem(i, 2, "Link", 0).Click
+			Browser("Buggy Cars Rating").Page("Popular Make Page").Sync
+	
+			
+			'Click Vote button if exists
+			If Browser("Buggy Cars Rating").Page("Popular Make Page").WebButton("btnVote").Exist Then
+				Browser("Buggy Cars Rating").Page("Popular Make Page").WebEdit("txtComment").Set "Yes"
+				Browser("Buggy Cars Rating").Page("Popular Make Page").WebButton("btnVote").Click
+				
+				'Validate if vote is counted
+				If Browser("Buggy Cars Rating").Page("Popular Make Page").WebElement("lblThanksForVote").Exist Then
+					Proc_LogTestResults "PASS", "Rate and vote car", "Successfully rated " + strModelToVote, False
+				Else 
+					Proc_LogTestResults "FAIL", "Rate and vote car", "Rating car " + strModelToVote + " failed" + strModelToVote, True
+				End If
+	
+			Else 
+				Proc_LogTestResults "FAIL", "Rate and vote car", "Current user already voted for the car " + strModelToVote, True
+			End If
+			'Break the loop
+			Exit For
+		End If
+		
+		'Model to vote is not in the table
+		If i = numRowCount Then
+			Proc_LogTestResults "FAIL", "Rate and vote car", "Car model " + strModelToVote + " is not displayed in the table", True
+		End If
+	Next
+	
+	If Err.Description <> "" Then
+		Proc_LogTestResults "FAIL", "Proc_BCR_RateCarByPopularMake", "An unexpected error has occured: " & Err.Description, False
+		Err.clear
+		ExitActionIteration
+	End If
+	
+End Sub

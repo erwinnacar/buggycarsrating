@@ -1,0 +1,18 @@
+<Environment>
+	<Variable>
+		<Name>Url</Name>
+		<Value>https://buggy.justtestit.org/</Value>
+	</Variable>
+	<Variable>
+		<Name>Browser</Name>
+		<Value>C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</Value>
+	</Variable>
+	<Variable>
+		<Name>ScreenshotDir</Name>
+		<Value>C:\Users\Erwin\Documents\UFT One\Screenshots\</Value>
+	</Variable>
+	<Variable>
+		<Name>DataTableDir</Name>
+		<Value>C:\Users\Erwin\Documents\UFT One\Datatable\</Value>
+	</Variable>
+</Environment>
