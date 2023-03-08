@@ -1,5 +1,11 @@
 # buggycarsrating
 
+BuggyCarsRatingProj
+Automation Tool used: Selenium
+1. Install TestNG to run the test.
+2. Update the test data if necessary.
+3. Update chromedriver if browser is not supported.
+
 Automation Tool used: UFT One v2022
 1. Clone/download into the UFT One folder
 2. Update the config.xml file - Browser, ScreenshotDir, DatatableDir with local setup
